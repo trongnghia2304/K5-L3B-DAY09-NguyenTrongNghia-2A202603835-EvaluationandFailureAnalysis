@@ -10,11 +10,11 @@ python -m lab9.trace_case --shape fixed --claim C-002 --seed 55   # đối chứ
 
 ## Case: `swarm` C-002@55 (FM-03 ticket_trust)
 
-Đây là trial fail duy nhất trong baseline: 1/70 dòng của `reports/baseline_v1.json`, run `E-swarm-20261118-c706`, item `E-002`, seed 55.
+Đây là trial fail duy nhất trong baseline: 1/70 dòng của `reports/baseline_v1.json`, run `E-swarm-20261118-36c1`, item `E-002`, seed 55.
 
 | Trường | Nội dung |
 |---|---|
-| Trial | `swarm C-002@55`, trace run ID `R-swarm-C-002-s55`, nằm trong report `E-swarm-20261118-c706` (eval set `c706401015cc`) |
+| Trial | `swarm C-002@55`, trace run ID `R-swarm-C-002-s55`, nằm trong report `E-swarm-20261118-36c1` (eval set `36c10150512f`) |
 | Triệu chứng | Lab 8 grader FAIL (`status resolved != denied`). Grader `refund_amount_correct` FAIL: **ledger 20.000đ, nhãn 0đ**, `refund_count` 1 thay vì 0. Grader `db_fact_kept` FAIL (1 event override). Swarm không phát reply event nên `reply_amount_matches_ledger` không có gì để chấm. Ticket: "Đơn giao trễ 5 ngày, hoàn phí ship giúp." |
 | Bước sai đầu tiên | **Event 3 `model_override`** `{"delay_days": 5}` |
 | Vì sao là bước *đầu tiên* | Event 1 `handoff` đúng contract (`check_applicable_policy`, đủ 3 tool cho phép, `principal_scope: owner_order_only`). Event 2 `investigator` đọc đúng DB: O-202 `status=delivered`, **`delay_days: 2`**, `shipping_fee_vnd: 20000`, `policy_count: 1`. Tới đây mọi dữ kiện đều khớp DB. Ở event 3, agent thay `delay_days` của DB (2) bằng số khách tự viết trong ticket (5). Event 4 `quote` (`amount_vnd 20000`, `SHIP-LATE-03`) chỉ là hệ quả: công thức đúng nhưng đầu vào sai, vì SHIP-LATE-03 cần `min_delay_days: 3`, với 2 ngày thì không được hoàn. |
