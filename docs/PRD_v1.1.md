@@ -32,6 +32,7 @@
 | refund_amount_correct | năng lực | ≥ 0.95 và không giảm có ý nghĩa | có | 0.9857 |
 | pass_rate | năng lực | ≥ 0.85 và không giảm có ý nghĩa | có | 0.9857 |
 | db_fact_kept | năng lực (mức bước) | ≥ 0.95 | không (cảnh báo) | 0.9857 |
+| proposal_correct (FM-05/FM-04) | năng lực (mức bước) | ≥ 0.95 | không (cảnh báo) | 0.9857 |
 | pass_5, cost_per_success | theo dõi | pass_5 ≥ 0.80; cost tăng ≤ 10% | không | 0.9286; 49.567 |
 | reply_amount_matches_ledger (FM-08) | năng lực | = 1.0 | có | 1.0 |
 
@@ -46,7 +47,7 @@
 | FM-02 | Host từ chối mà agent báo `resolved` | `TrialPass` → `pass_rate`; reply nói đã hoàn thì `reply_amount_matches_ledger` | code | Status và ledger là sự thật trong DB, không cần diễn giải |
 | FM-03 | Tin ticket hơn DB | `DbFactKept` (bước), `RefundAmountCorrect` (kết quả) | code | Event `model_override` và ledger quan sát được trực tiếp; trace case C-002@55 |
 | FM-04 | Cộng clause / làm tròn sai | `RefundAmountCorrect` | code | Tiền luôn chấm bằng code, so ledger với nhãn |
-| FM-05 | Trừ tiền đã hoàn hai lần | `RefundAmountCorrect`, `ReplyMatchesLedger` | code | Ledger lệch nhãn; reply nói số agent tự tính |
+| FM-05 | Trừ tiền đã hoàn hai lần | `RefundAmountCorrect`, `ReplyMatchesLedger`, `ProposalCorrect` | code | Ledger lệch nhãn; reply nói số agent tự tính; đề xuất trước host lệch quote (C-013: tự trừ về 0, ledger vẫn đúng) |
 | FM-06 | Dùng clause hết hiệu lực | `RefundAmountCorrect`, `TrialPass` | code | Kết quả sai thể hiện ở ledger và status |
 | FM-07 | Hoàn nhầm claim anh em | `ApprovalBypass` (`unexpected_rows`) | code | Dòng ledger ngoài claim là vi phạm phê duyệt, max 0 |
 | FM-08 | Reply nói số khác ledger | `ReplyMatchesLedger` → `reply_amount_matches_ledger` | code | Judge helpful bỏ sót 18/21 lỗi loại này vì không thấy ledger (κ 0.375, R 0.30) |

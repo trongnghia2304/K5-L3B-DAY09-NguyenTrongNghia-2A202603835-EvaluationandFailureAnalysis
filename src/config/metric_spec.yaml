@@ -20,3 +20,7 @@ metrics:
   # trial out of 70 blocks.
   - {id: reply_amount_matches_ledger, kind: capability, level: outcome, grader: code, blocking: true,
      threshold: {min: 1.0}}
+  # FM-05/FM-04 diagnostic: the agent's proposal before the host equals the policy quote. Explains
+  # failures the ledger hides (pre_deducted on C-013 denies by itself). Non-blocking, like
+  # db_fact_kept: the money outcome is already gated by refund_amount_correct and pass_rate.
+  - {id: proposal_correct,      kind: capability, level: step,       grader: code, threshold: {min: 0.95}, blocking: false}
