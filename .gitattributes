@@ -1,0 +1,4 @@
+# The eval set is hashed (manifest.eval_set_sha) and compared between a Windows checkout and the
+# Linux CI: keep its bytes identical everywhere, never convert it to CRLF on checkout.
+src/data/eval/eval_set_*.jsonl text eol=lf
+src/data/eval/labels_*.json text eol=lf
