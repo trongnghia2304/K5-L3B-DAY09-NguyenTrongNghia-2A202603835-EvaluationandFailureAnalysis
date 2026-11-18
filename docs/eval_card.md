@@ -19,6 +19,7 @@ Card này đi kèm mỗi báo cáo và được dùng lại ở Day 10. Mọi s�
 | `pass_rate` | capability, outcome | min 0.85 + không giảm có ý nghĩa | có |
 | `reply_amount_matches_ledger` (FM-08) | capability, outcome | min 1.0 | có |
 | `db_fact_kept` | capability, step | min 0.95 | không |
+| `proposal_correct` (FM-05/FM-04) | capability, step | min 0.95 | không |
 | `pass_5` | capability | min 0.80 | không |
 | `cost_per_success` | system | tăng ≤ 10% | không |
 
@@ -34,6 +35,7 @@ Card này đi kèm mỗi báo cáo và được dùng lại ở Day 10. Mọi s�
 | pass_rate | 0.9857 | 1.0 | +0.014 [+0.000, +0.043] | **0.7143** | **−0.271 [−0.500, −0.057]** |
 | reply_amount_matches_ledger | 1.0 | 1.0 | | **0.7857** | |
 | db_fact_kept | 0.9857 | 1.0 | | 0.9286 | |
+| proposal_correct | 0.9857 | 1.0 | | 0.7857 | |
 | pass_5 | 0.9286 | 1.0 | | 0.7143 | |
 | cost_per_success | 49.567 | 48.716 | | 81.202 | |
 | **Gate** | | **exit 0, merge** | | **exit 1, blocked:** `refund_amount_correct`, `pass_rate`, `reply_amount_matches_ledger` | |
@@ -131,3 +133,9 @@ Kết quả:
 - **Lỗ hổng còn lại của `integrity_check`:** gate không chạy lại agent. Một report được làm giả *nhất quán*, ví dụ đổi một dòng fail thành pass rồi tính lại aggregate cho khớp, sẽ qua được integrity. Chỉ việc CI tự chạy eval (như job `eval-gate` đang làm với `swarm`) hoặc ký report mới chặn được kiểu gian lận này.
 - Ratchet chỉ so với `--base-spec` được truyền vào. Nếu CI không truyền spec của `main` thì không có ratchet.
 - Slice dựa trên nhãn (`refund_vnd > 0`, `status`). Item thiếu nhãn đúng thì cũng nằm ngoài slice.
+
+### Ghi chú: `proposal_correct` (bổ sung sau M7)
+
+`python -m lab9.mutation --detect` ban đầu ra **75%**, dưới mục tiêu 80%. Nguyên nhân là 5/20 dòng fail `pass_rate` của `seeded_regression` (E-013, FM-05) không grader nào giải thích được. Agent tự trừ khoản đã hoàn, đề xuất về 0 rồi tự từ chối mà không gọi host. Ledger (0đ) và reply (không nêu số tiền) đều trông đúng, Lab 8 grader chỉ báo `proposal_mismatch`.
+
+Mình đã thêm grader `ProposalCorrect` (đề xuất trước khi gửi host phải bằng `proposal_amount` của nhãn) ở mức bước, **không blocking**. Sau khi thêm: **detection 100%, báo nhầm 0%**. Gate vẫn quyết định y như trước: `fixed` merge, `seeded_regression` block, scorecard v2 3/3, các trap đều bị chặn.

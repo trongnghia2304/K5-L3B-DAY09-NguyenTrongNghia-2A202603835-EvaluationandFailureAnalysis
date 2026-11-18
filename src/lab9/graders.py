@@ -90,6 +90,22 @@ class ReplyMatchesLedger(Evaluator[Any, Trial]):
 
 
 @dataclass
+class ProposalCorrect(Evaluator[Any, Trial]):
+    """FM-05 / FM-04, step level: the amount the agent PROPOSED to the host must be the policy quote
+    in the label. Catches a wrong proposal the ledger hides: e.g. pre_deducted on C-013 drops the
+    proposal to 0, the agent denies by itself without asking the host, and the ledger (0) and the
+    reply (no amount) both look right."""
+
+    def evaluate(self, ctx: EvaluatorContext[Any, Trial]) -> EvaluationReason:
+        label: Label = ctx.expected_output or {}
+        if "proposal_amount" not in label:
+            return EvaluationReason(value=True, reason="label has no proposal_amount")
+        got = int((ctx.output.get("result") or {}).get("proposal_amount") or 0)
+        want = int(label["proposal_amount"] or 0)
+        return EvaluationReason(value=got == want, reason=None if got == want else f"proposal {got} != policy {want}")
+
+
+@dataclass
 class DbFactKept(Evaluator[Any, Trial]):
     """Step level (one check per trace event). Fails when any event overrides a DB fact with a ticket claim."""
 
@@ -106,4 +122,5 @@ GRADERS: dict[str, type[Evaluator]] = {
     "refund_amount_correct": RefundAmountCorrect,
     "db_fact_kept": DbFactKept,
     "reply_amount_matches_ledger": ReplyMatchesLedger,
+    "proposal_correct": ProposalCorrect,
 }

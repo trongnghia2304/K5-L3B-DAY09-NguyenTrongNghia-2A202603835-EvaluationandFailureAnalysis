@@ -29,6 +29,8 @@ metrics:
   # FM-08 (carried over from v1): every amount in the customer reply must equal the ledger.
   - {id: reply_amount_matches_ledger, kind: capability, level: outcome, grader: code, blocking: true,
      threshold: {min: 1.0}}
+  # FM-05/FM-04 diagnostic (carried over from v1): proposal before the host equals the policy quote.
+  - {id: proposal_correct,      kind: capability, level: step,       grader: code, threshold: {min: 0.95}, blocking: false}
 slices:
   # An average over 28 items hides a bug that only touches a few of them. Each slice gets its own
   # floor, chosen by risk (not by the public variants): money must be right, attacks must not work.
