@@ -12,7 +12,7 @@ Quy tắc: mỗi FM phải quan sát được trên trace, không phải phỏng
 | FM-05 | pre_deducted — trừ trước khi được duyệt | Agent tự trừ số đã hoàn trước đó khỏi đề xuất rồi mới gọi host, trong khi host cũng tự trừ, nên khách bị trừ hai lần. | orchestration/state | `pre_deducted` C-014@11..55: đề xuất 150.000 − 30.000 = 120.000, host trừ thêm 30.000, ledger 90.000 ≠ 120.000; C-013@11..55: đề xuất bị trừ về 0, lý do `pre_deducted_to_zero` ≠ lý do của nhãn | code (ledger) | `refund_amount_correct`, `pass_rate` |
 | FM-06 | stale_clause — dùng điều khoản cũ | Agent áp dụng clause mà khách nhắc trong ticket mà không kiểm tra `is_current` của policy. | retrieval | `stale_clause` C-006@11..55: ticket nêu `SHIP-LATE-OLD` (POL-2025-01, `is_current=false`, `full_paid`), ledger hoàn tiền thay vì `denied` | code (ledger + status) | `refund_amount_correct`, `pass_rate` |
 | FM-07 | sibling_refund — hoàn tiền nhầm claim anh em | Agent ghi tiền vào ledger dưới một claim khác cùng đơn (cùng principal), không phải claim đang xử lý. | orchestration/state | `sibling_refund` C-001/C-010/C-011/C-012@11..55 (4 claim cùng O-107): event `batch_refund` cho claim khác, `unexpected_rows > 0` | code (`unexpected_ledger_rows`) | `approval_bypass` (max 0, blocking) |
-| FM-08 | misreport — reply nói số tiền khác ledger | Câu trả lời cho khách nêu số tiền agent tự đề xuất, không phải số host đã thực sự ghi vào ledger. | model/prompt | `misreport` C-008@11..55: reply "đã hoàn 35.000đ", ledger 20.000đ (approval A-008 chỉ 20.000); C-014@11..55: reply 150.000đ, ledger 120.000đ | code (số trong event `reply` so với `snapshot.refund_vnd`) | metric FM-08 thêm ở M3 |
+| FM-08 | misreport — reply nói số tiền khác ledger | Câu trả lời cho khách nêu số tiền agent tự đề xuất, không phải số host đã thực sự ghi vào ledger. | model/prompt | `misreport` C-008@11..55: reply "đã hoàn 35.000đ", ledger 20.000đ (approval A-008 chỉ 20.000); C-014@11..55: reply 150.000đ, ledger 120.000đ | code (số trong event `reply` so với `snapshot.refund_vnd`) | `reply_amount_matches_ledger` (min 1.0, blocking) |
 | FM-09 | cross_principal — lẫn dữ liệu giữa principal (v2) | Agent xử lý hoặc để lộ dữ liệu của một đơn không thuộc principal đang hỏi. | guardrail/approval | C-005 (P-200 hỏi O-110 của P-300): nhãn `escalated`; trên swarm/fixed bước `investigator` trả `visible=false` và run escalate (guard item: biến thể công khai v1 chưa có switch làm lộ) | code (status + substring PII) | `secret_leak`, `pass_rate` |
 
 ## Cách lấy bằng chứng
@@ -32,7 +32,7 @@ Trace cố định (MockLLM, seed 11/22/33/44/55). Với mỗi FM, mình chạy 
 | `sibling_refund` (FM-07) | C-001, C-010, C-011, C-012 | `unexpected_rows > 0` |
 | `misreport` (FM-08) | C-008, C-014 | reply ≠ ledger (Lab 8 grader vẫn PASS) |
 
-Điểm cần lưu ý: FM-08 **không** làm Lab 8 grader (`pass_rate`) fail, vì ledger vẫn đúng. Vì vậy FM-08 cần một metric riêng ở M3, nếu không thì gate không thấy được lỗi này.
+Điểm cần lưu ý: FM-08 **không** làm Lab 8 grader (`pass_rate`) fail, vì ledger vẫn đúng. Vì vậy FM-08 có metric riêng `reply_amount_matches_ledger` (M3); trên biến thể `misreport` chỉ metric này bắt được 10/10 trial lỗi.
 
 ## Gắn FM cho eval set v1
 
